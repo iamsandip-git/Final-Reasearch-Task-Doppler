@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: mydatabase  # Correct environment variable for PostgreSQL
+      POSTGRES_USER: myuser     # Correct environment variable for PostgreSQL
+      POSTGRES_PASSWORD: mypassword  # Correct environment variable for PostgreSQL
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - new-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_ENGINE: postgresql
+      DATABASE_NAME: mydatabase
+      DATABASE_USER: myuser
+      DATABASE_PASSWORD: mypassword
+      DATABASE_HOST: db  # Use the service name "db" instead of "localhost"
+      DATABASE_PORT: 5432
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - new-network
+
+  frontend:
+    build:
+      context: ./frontend/news-site
+      dockerfile: Dockerfile
+    container_name: react_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+    environment:
+      REACT_APP_API_URL: http://backend:8000  # Use the service name "backend" instead of "localhost"
+    depends_on:
+      - backend
+    networks:
+      - new-network
+
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    container_name: news_scraper
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_HOST: db  # Use the service name "db" instead of "localhost"
+      DATABASE_NAME: mydatabase
+      DATABASE_PORT: 5432
+      DATABASE_USER: myuser
+      DATABASE_PASSWORD: mypassword
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - new-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  new-network:
+    driver: bridge
