@@ -1,0 +1,38 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - final-task
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Install SSH key for EC2 access
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Step 3: SSH into EC2 instance and deploy
+      - name: Deploy to EC2
+        run: |
+          # Set up SSH connection
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          # Clone the repository
+          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git /home/ec2-user/app
+          cd /home/ec2-user/app
+
+          # Build and run the Docker containers
+          docker-compose up -d --build
+
+          # Print the public IP of the EC2 instance
+          echo "Application deployed successfully!"
+          echo "Public IP: ${{ secrets.EC2_PUBLIC_IP }}"
+          EOF
