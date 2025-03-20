@@ -5,15 +5,15 @@ services:
     restart: always
     container_name: postgres_db
     environment:
-      POSTGRES_DB: mydatabase  # Correct environment variable for PostgreSQL
-      POSTGRES_USER: myuser     # Correct environment variable for PostgreSQL
-      POSTGRES_PASSWORD: mypassword  # Correct environment variable for PostgreSQL
+      POSTGRES_DB: ${DATABASE_NAME}  
+      POSTGRES_USER: ${DATABASE_USER}     
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}  
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -25,16 +25,18 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: django_backend
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     environment:
-      DATABASE_ENGINE: postgresql
-      DATABASE_NAME: mydatabase
-      DATABASE_USER: myuser
-      DATABASE_PASSWORD: mypassword
-      DATABASE_HOST: db                         # Use the service name "db" instead of "localhost"
-      DATABASE_PORT: 5432
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}             
+      DATABASE_PORT: ${DATABASE_PORT}
     ports:
       - "8000:8000"
     depends_on:
@@ -47,13 +49,15 @@ services:
     build:
       context: ./frontend/news-site
       dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL}
     container_name: react_frontend
     ports:
       - "3030:3030"
     volumes:
       - /app/node_modules
     environment:
-      REACT_APP_API_URL: http://backend:8000  # Use the service name "backend" instead of "localhost"
+      REACT_APP_API_URL: ${REACT_APP_API_URL} 
     depends_on:
       - backend
     networks:
@@ -67,21 +71,25 @@ services:
     volumes:
       - .:/app
     environment:
-      DATABASE_HOST: db  # Use the service name "db" instead of "localhost"
-      DATABASE_NAME: mydatabase
-      DATABASE_PORT: 5432
-      DATABASE_USER: myuser
-      DATABASE_PASSWORD: mypassword
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_HOST: ${DATABASE_HOST} 
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
+      backend:
+        condition: service_started
       db:
         condition: service_healthy
+      
     networks:
       - new-network
   loki:
     image: grafana/loki:latest
     container_name: loki
     ports:
-      - "3100:3100"  # Loki runs on port 3100 
+      - "3100:3100" 
     volumes:
      - ./loki-config.yml:/etc/loki/config.yml
     command: -config.file=/etc/loki/config.yml -config.expand-env=true
@@ -94,8 +102,8 @@ services:
     volumes:
       - ./promtail-config.yml:/etc/promtail/config.yml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro  # Mount Docker logs
-      - /var/log:/var/log:ro  # Mount system logs
-      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket
+      - /var/log:/var/log:ro                                      # Mount system logs
+      - /var/run/docker.sock:/var/run/docker.sock                 # Mount Docker socket
     command: -config.file=/etc/promtail/config.yml -config.expand-env=true
     depends_on:
       - loki
@@ -146,7 +154,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     ports:
-      - "3000:3000"       # Grafana now runs on port 3000 (host) mapped to 3000 (container)
+      - "3000:3000"      
     depends_on:
       - loki
       - prometheus
