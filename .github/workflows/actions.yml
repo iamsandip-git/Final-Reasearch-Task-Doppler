@@ -2,37 +2,44 @@ name: Deploy to EC2
 
 on:
   push:
-    branches:
-      - final-task
+    branches: [final-task-doppler]
+
+env:
+  EC2_USER: ubuntu
+  APP_DIR: /home/ubuntu/app
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Step 2: Install SSH key for EC2 access
-      - name: Install SSH key
+      - name: Install Doppler CLI
+        uses: DopplerHQ/action-cli@v1
+        with:
+          token: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
-      # Step 3: SSH into EC2 instance and deploy
-      - name: Deploy to EC2
-        run: |
-          # Set up SSH connection
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          # Clone the repository
-          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git /home/ec2-user/app
-          cd /home/ec2-user/app
+      - name: Copy Files to EC2
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ubuntu
+          source: "."
+          target: ${{ env.APP_DIR }}
+          strip_components: 1
 
-          # Build and run the Docker containers
-          docker-compose up -d --build
-
-          # Print the public IP of the EC2 instance
-          echo "Application deployed successfully!"
-          echo "Public IP: ${{ secrets.EC2_PUBLIC_IP }}"
-          EOF
+      - name: Deploy with Doppler
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ubuntu
+          script: |
+            cd ${{ env.APP_DIR }}
+            doppler run -- docker compose down
+            doppler run -- docker compose up -d --build
