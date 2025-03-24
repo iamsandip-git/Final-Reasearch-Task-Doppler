@@ -27,6 +27,8 @@ services:
     container_name: django_backend
     command: >
       sh -c "python manage.py migrate &&
+             python manage.py makemigrations api &&
+             python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
       DATABASE_ENGINE: ${DATABASE_ENGINE}
