@@ -11,15 +11,17 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Doppler CLI
-        uses: DopplerHQ/action-cli@v1
-        with:
-          token: ${{ secrets.DOPPLER_TOKEN }}
+      - name: Install CLI
+        uses: dopplerhq/cli-action@v3
+      - name: Do something with the CLI
+        run: doppler secrets --only-names
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
@@ -42,5 +44,5 @@ jobs:
           username: ubuntu
           script: |
             cd ${{ env.APP_DIR }}
-            doppler run -- docker compose down
-            doppler run -- docker compose up -d --build
+            doppler run -- docker compose down -v
+            doppler run -- docker compose up -d 
