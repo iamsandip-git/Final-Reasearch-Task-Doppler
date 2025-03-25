@@ -51,6 +51,7 @@ Install node js from: https://nodejs.org/en/download/package-manager
 Switch to the **news-site** directory which is inside the **frontend** directory.
 
 Then run:
+
 **npm i**
 
 After that run: 
