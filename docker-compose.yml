@@ -78,7 +78,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_healthy
       
