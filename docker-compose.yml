@@ -48,7 +48,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
+      start_period: 2s
 
   frontend:
     build:
@@ -74,11 +74,7 @@ services:
       dockerfile: Dockerfile
     container_name: news_scraper
     command: > 
-      sh -c "while ! curl -s http://backend:8000/health/ >/dev/null; do
-             echo 'Waiting for backend...';
-             sleep 5;
-             done &&
-            ./scraper/python main.py"
+      sh -c "sleep 20 && ./scraper/python main.py"
     volumes:
       - .:/app
     environment:
@@ -90,7 +86,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
       db:
         condition: service_healthy
       
