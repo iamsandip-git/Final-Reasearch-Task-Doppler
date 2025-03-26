@@ -1,13 +1,12 @@
-
 services:
   db:
     image: postgres:13
     restart: always
     container_name: postgres_db
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}  
-      POSTGRES_USER: ${DATABASE_USER}     
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}  
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -26,7 +25,11 @@ services:
       dockerfile: Dockerfile
     container_name: django_backend
     command: >
-      sh -c "python manage.py makemigrations api &&
+      sh -c "while ! nc -z $${DATABASE_HOST} $${DATABASE_PORT}; do
+               echo 'Waiting for PostgreSQL...';
+               sleep 2;
+             done &&
+             python manage.py makemigrations api &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
@@ -34,8 +37,9 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: ${DATABASE_HOST}             
+      DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
+      ALLOWED_HOSTS: "18.170.212.180,localhost,127.0.0.1"
     ports:
       - "8000:8000"
     depends_on:
@@ -48,7 +52,35 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 5s
+      start_period: 20s
+
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    container_name: news_scraper
+    command: >
+      sh -c "while ! curl -s http://backend:8000/health >/dev/null; do
+               echo 'Waiting for backend...';
+               sleep 5;
+             done &&
+             ./start_scraper.sh"
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    depends_on:
+      backend:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - new-network
 
   frontend:
     build:
@@ -84,7 +116,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_healthy
       
