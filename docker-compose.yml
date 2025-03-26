@@ -25,11 +25,7 @@ services:
       dockerfile: Dockerfile
     container_name: django_backend
     command: >
-      sh -c "while ! nc -z $${DATABASE_HOST} $${DATABASE_PORT}; do
-               echo 'Waiting for PostgreSQL...';
-               sleep 2;
-             done &&
-             python manage.py makemigrations api &&
+      sh -c "python manage.py makemigrations api &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
@@ -48,11 +44,11 @@ services:
     networks:
       - new-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 10s
 
   scraper:
     build:
@@ -62,7 +58,7 @@ services:
     command: >
       sh -c "while ! curl -s http://backend:8000/health >/dev/null; do
                echo 'Waiting for backend...';
-               sleep 5;
+               sleep 30;
              done &&
              ./start_scraper.sh"
     volumes:
@@ -76,7 +72,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
       db:
         condition: service_healthy
     networks:
