@@ -63,6 +63,6 @@ Make sure the Django server is running for the UI to show the news stored in dat
 You can periodically run the crawler to update new news items.
 
 You can also delete news from the database via the **Django admin panel**.
-you just calm and do cicd to test the project.
+you just calm down and do cicd to test the project.
 
 
