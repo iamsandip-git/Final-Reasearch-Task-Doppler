@@ -35,7 +35,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
-      ALLOWED_HOSTS: "18.170.212.180,localhost,127.0.0.1"
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     ports:
       - "8000:8000"
     depends_on:
@@ -44,11 +44,11 @@ services:
     networks:
       - new-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://3.8.143.101:8000/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
 
   scraper:
     build:
@@ -56,11 +56,11 @@ services:
       dockerfile: Dockerfile
     container_name: news_scraper
     command: >
-      sh -c "while ! curl -s http://backend:8000/health >/dev/null; do
+       sh -c "while ! curl -s http://backend:8000/health >/dev/null; do  
                echo 'Waiting for backend...';
                sleep 5;
              done &&
-             ./start_scraper.sh"
+             ./main.py"                        #Replace with actual command
     volumes:
       - .:/app
     environment:
@@ -72,7 +72,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_healthy
     networks:
@@ -95,29 +95,6 @@ services:
       - backend
     networks:
       - new-network
-
-  # scraper:
-  #   build:
-  #     context: ./scraper
-  #     dockerfile: Dockerfile
-  #   container_name: news_scraper
-  #   volumes:
-  #     - .:/app
-  #   environment:
-  #     DATABASE_ENGINE: ${DATABASE_ENGINE}
-  #     DATABASE_HOST: ${DATABASE_HOST} 
-  #     DATABASE_NAME: ${DATABASE_NAME}
-  #     DATABASE_PORT: ${DATABASE_PORT}
-  #     DATABASE_USER: ${DATABASE_USER}
-  #     DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-  #   depends_on:
-  #     backend:
-  #       condition: service_healthy
-  #     db:
-  #       condition: service_healthy
-      
-  #   networks:
-  #     - new-network
   loki:
     image: grafana/loki:latest
     container_name: loki

@@ -3,7 +3,7 @@ FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /app
-
+RUN apt-get update && apt-get install -y curl
 # Copy the requirements file into the container
 COPY requirements.txt .
 
