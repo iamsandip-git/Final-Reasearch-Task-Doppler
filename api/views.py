@@ -5,7 +5,7 @@ from .models import News
 from django.http import JsonResponse
 
 def health_check(request):
-    return JsonResponse({"status": "ok"})
+    return JsonResponse({"status": "ok"} ,status=200)
 
 class ListNews(generics.ListAPIView):
     serializer_class = NewsSerializer
