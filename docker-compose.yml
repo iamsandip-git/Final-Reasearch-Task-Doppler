@@ -43,24 +43,24 @@ services:
         condition: service_healthy
     networks:
       - new-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 30s
 
   scraper:
     build:
       context: ./scraper
       dockerfile: Dockerfile
     container_name: news_scraper
-    command: >
-       sh -c "while ! curl -s http://backend:8000/health >/dev/null; do  
-               echo 'Waiting for backend...';
-               sleep 5;
-             done &&
-             ./main.py"                        #Replace with actual command
+    # command: >
+    #    sh -c "while ! curl -s http://backend:8000/health >/dev/null; do  
+    #            echo 'Waiting for backend...';
+    #            sleep 5;
+    #          done &&
+    #          ./main.py"                        #Replace with actual command
     volumes:
       - .:/app
     environment:
@@ -72,7 +72,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
       db:
         condition: service_healthy
     networks:
