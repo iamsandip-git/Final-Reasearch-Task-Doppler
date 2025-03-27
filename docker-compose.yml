@@ -44,7 +44,7 @@ services:
     networks:
       - new-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://3.8.143.101:8000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,7 +58,7 @@ services:
     command: >
       sh -c "while ! curl -s http://backend:8000/health >/dev/null; do
                echo 'Waiting for backend...';
-               sleep 30;
+               sleep 5;
              done &&
              ./start_scraper.sh"
     volumes:
