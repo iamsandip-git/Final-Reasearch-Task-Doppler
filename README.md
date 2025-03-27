@@ -64,5 +64,5 @@ You can periodically run the crawler to update new news items.
 
 You can also delete news from the database via the **Django admin panel**.
 you just calm down and do cicd to test the project in the ec2 instance.
-
+try hard.
 
