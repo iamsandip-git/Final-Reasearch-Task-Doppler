@@ -6,6 +6,8 @@ WORKDIR /app
 
 # Copy the requirements file into the container
 COPY requirements.txt .
+COPY wait-for-it.sh . 
+RUN chmod +x /wait-for-it.sh
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
@@ -17,6 +19,4 @@ COPY . .
 ENV PYTHONUNBUFFERED=1
 COPY main.py .
 # Run migrations and start the scraper script
-CMD [python manage.py makemigrations && \
-    python manage.py migrate && \
-    python ./scraper/main.py]
+CMD ["python", "./scraper/main.py"]
