@@ -1,15 +1,14 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM ubuntu:16.04
+
+# Install prerequisites
+RUN apt-get update && apt-get install -y \
+curl
 
 # Set the working directory in the container
 WORKDIR /app
-RUN sed -i 's/deb.debian.org/ftp.us.debian.org/debian/' /etc/apt/sources.list && \
-    apt-get update -o Acquire::Check-Valid-Until=false && \
-    apt-get install -y --no-install-recommends \
-        curl \
-        ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*to the container
+
+# Copy the requirements file into the container
 COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
