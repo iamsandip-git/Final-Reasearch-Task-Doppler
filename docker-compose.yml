@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   db:
     image: postgres:13
@@ -49,7 +51,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-   
 
   scraper:
     build:
@@ -87,18 +88,19 @@ services:
     volumes:
       - /app/node_modules
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL} 
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
     depends_on:
       - backend
     networks:
       - new-network
+
   loki:
     image: grafana/loki:latest
     container_name: loki
     ports:
-      - "3100:3100" 
+      - "3100:3100"
     volumes:
-     - ./loki-config.yml:/etc/loki/config.yml
+      - ./loki-config.yml:/etc/loki/config.yml
     command: -config.file=/etc/loki/config.yml -config.expand-env=true
     networks:
       - new-network
@@ -108,29 +110,30 @@ services:
     container_name: promtail
     volumes:
       - ./promtail-config.yml:/etc/promtail/config.yml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro  # Mount Docker logs
-      - /var/log:/var/log:ro                                      # Mount system logs
-      - /var/run/docker.sock:/var/run/docker.sock                 # Mount Docker socket
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.yml -config.expand-env=true
     depends_on:
       - loki
     restart: always
     networks:
       - new-network
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml # Corrected config file path                              # Mount system logs
-      - /var/run/docker.sock:/var/run/docker.sock       # Mount Docker socket
-      - prometheus_data:/prometheus                     #persistent volume
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     depends_on:
       - loki
     ports:
       - 9090:9090
-    networks: 
+    networks:
       - new-network
 
   node-exporter:
@@ -161,7 +164,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     ports:
-      - "3000:3000"      
+      - "3000:3000"
     depends_on:
       - loki
       - prometheus
