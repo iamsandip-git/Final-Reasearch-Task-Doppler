@@ -72,7 +72,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
       db:
         condition: service_healthy
     networks:
