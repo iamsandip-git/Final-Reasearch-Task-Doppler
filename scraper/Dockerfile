@@ -3,13 +3,13 @@ FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /app
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
-    sed -i 's/deb.debian.org/httpredir.debian.org/' /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y curl && \
+RUN sed -i 's/deb.debian.org/ftp.us.debian.org/debian/' /etc/apt/sources.list && \
+    apt-get update -o Acquire::Check-Valid-Until=false && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-# Copy the requirements file into the container
+    rm -rf /var/lib/apt/lists/*to the container
 COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
