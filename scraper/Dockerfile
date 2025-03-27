@@ -1,23 +1,22 @@
-FROM python:3.9-slim-bullseye
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
 
-# Fix repository sources and install dependencies
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 && \
-    apt-get update -o Acquire::Check-Valid-Until=false && \
-    apt-get install -y --no-install-recommends \
-        curl \
-        ca-certificates && \
-    curl -o /app/wait-for-it.sh \
-        https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
-    chmod +x /app/wait-for-it.sh && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
+# Set the working directory in the container
 WORKDIR /app
 
+# Copy the requirements file into the container
 COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the current directory contents into the container at /app
 COPY . .
 
-CMD ["python", "main.py"]
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+COPY main.py .
+# Run migrations and start the scraper script
+CMD [python manage.py makemigrations && \
+    python manage.py migrate && \
+    python ./scraper/main.py]
