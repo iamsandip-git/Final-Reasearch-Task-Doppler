@@ -31,7 +31,7 @@ DEBUG = True
 print("Allowed hosts is:")
 print(os.getenv("ALLOWED_HOSTS"))
 
-ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
+ALLOWED_HOSTS = []
 
 
 # Application definition
