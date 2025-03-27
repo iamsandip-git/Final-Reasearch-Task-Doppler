@@ -67,5 +67,5 @@ jobs:
           script: |
             cd ${{ env.APP_DIR }}
             doppler run -- docker compose down -v
-            doppler run -- docker compose build --no-cache 
-            doppler run -- docker compose up -d 
+            doppler run -- docker compose build --no-cache
+            doppler run -- docker compose up -d --force-recreate
