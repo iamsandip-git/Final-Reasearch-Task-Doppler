@@ -3,18 +3,25 @@ FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /app
-RUN apt-get update && apt-get install -y curl
-# Copy the requirements file into the container
+
+# Install system dependencies first
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the current directory contents into the container at /app
+# Copy the rest of the application
 COPY . .
 
 # Set environment variables
-ENV PYTHONUNBUFFERED=1
-COPY main.py .
-# Run migrations and start the scraper script
-CMD ["python", "./scraper/main.py"]
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH="${PYTHONPATH}:/app"
+
+# Specify the command to run the scraper
+CMD ["python", "main.py"]  # Or your actual entrypoint script
