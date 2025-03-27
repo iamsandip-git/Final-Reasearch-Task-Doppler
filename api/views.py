@@ -2,7 +2,10 @@ from rest_framework import generics
 from itertools import zip_longest, chain
 from .serializers import NewsSerializer
 from .models import News
+from django.http import JsonResponse
 
+def health_check(request):
+    return JsonResponse({"status": "ok"})
 
 class ListNews(generics.ListAPIView):
     serializer_class = NewsSerializer

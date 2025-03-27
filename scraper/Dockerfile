@@ -1,20 +1,26 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# scraper/Dockerfile
 
-# Set the working directory in the container
+FROM python:3.9-slim-bullseye
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy wait-for-it script
+COPY wait-for-it.sh /app/wait-for-it.sh
+RUN chmod +x /app/wait-for-it.sh
+
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Copy requirements and install
 COPY requirements.txt .
-
-# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the current directory contents into the container at /app
+# Copy application code
 COPY . .
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-COPY main.py .
-# Run migrations and start the scraper script
-CMD ["python", "./scraper/main.py"]
+CMD ["python", "main.py"]
