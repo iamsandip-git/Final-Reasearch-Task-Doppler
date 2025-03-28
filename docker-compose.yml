@@ -46,7 +46,7 @@ services:
     networks:
       - new-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f https://18.132.37.204/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
