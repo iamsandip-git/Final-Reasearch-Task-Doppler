@@ -45,12 +45,12 @@ services:
         condition: service_healthy
     networks:
       - new-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-      interval: 15s
-      timeout: 15s
-      retries: 10
-      start_period: 30s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+    #   interval: 15s
+    #   timeout: 15s
+    #   retries: 10
+    #   start_period: 30s
 
   scraper:
     build:
@@ -68,7 +68,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
       db:
         condition: service_healthy
     command: >
