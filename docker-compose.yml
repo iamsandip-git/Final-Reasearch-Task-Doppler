@@ -46,11 +46,11 @@ services:
     networks:
       - new-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f https://18.132.37.204/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      test: ["CMD-SHELL", "curl -f http://localhost/health:8000 || exit 1"]
+      interval: 15s
+      timeout: 15s
+      retries: 15
+      start_period: 30s
 
   scraper:
     build:
