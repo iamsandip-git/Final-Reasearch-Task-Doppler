@@ -27,9 +27,10 @@ services:
       dockerfile: Dockerfile
     container_name: django_backend
     command: >
-      sh -c "python manage.py makemigrations api &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "./wait-for-db.sh &&
+              python manage.py makemigrations api &&
+              python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
     environment:
       DATABASE_ENGINE: ${DATABASE_ENGINE}
       DATABASE_NAME: ${DATABASE_NAME}
@@ -45,12 +46,12 @@ services:
         condition: service_healthy
     networks:
       - new-network
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-    #   interval: 15s
-    #   timeout: 15s
-    #   retries: 10
-    #   start_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://backend:8000/health || exit 1"]
+      interval: 15s
+      timeout: 15s
+      retries: 10
+      start_period: 120s
 
   scraper:
     build:
@@ -68,11 +69,11 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_healthy
     command: >
-      sh -c ".scraper/wait-for-it.sh backend:8000 --timeout=60 --strict -- python main.py"
+      sh -c ".scraper/wait-for-it.sh backend:8000 --timeout=240 --strict -- python main.py"
     networks:
       - new-network
 
