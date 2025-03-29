@@ -31,7 +31,7 @@ DEBUG = True
 # print("Allowed hosts is:")
 # print(os.getenv("ALLOWED_HOSTS"))
 
-ALLOWED_HOSTS = ["13.40.66.100", "localhost"]
+ALLOWED_HOSTS = ["13.40.66.100", "localhost", "backend"]
 
 
 # Application definition
