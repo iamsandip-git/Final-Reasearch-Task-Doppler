@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
+COPY wait-for-db.sh /app/wait-for-db.sh
+RUN chmod +x /app/wait-for-db.sh
 
 COPY . /app/
 
