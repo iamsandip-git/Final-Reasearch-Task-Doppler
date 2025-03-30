@@ -59,7 +59,7 @@ services:
       dockerfile: Dockerfile
     container_name: news_scraper
     volumes:
-      - .:/app
+    - .:/app
     environment:
       DATABASE_ENGINE: ${DATABASE_ENGINE}
       DATABASE_HOST: ${DATABASE_HOST}
@@ -73,9 +73,9 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c ".wait-for-it.sh db:5432 --timeout=240 --strict -- python main.py"
+      sh -c "/app/.wait-for-it.sh db:5432 --timeout=240 --strict -- python main.py"
     networks:
-      - new-network
+    - new-network
 
   frontend:
     build:
