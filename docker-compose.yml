@@ -73,7 +73,7 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c ".scraper/wait-for-it.sh db:5432 --timeout=240 --strict -- python main.py"
+      sh -c ".wait-for-it.sh db:5432 --timeout=240 --strict -- python main.py"
     networks:
       - new-network
 
