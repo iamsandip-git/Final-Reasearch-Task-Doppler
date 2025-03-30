@@ -60,6 +60,6 @@ jobs:
           script: |
             cd ${{ env.APP_DIR }}
             doppler run -- docker compose down -v
-            dippler run -- docker image prune -af
+            doppler run -- docker image prune -af
             doppler run -- docker compose build --no-cache
             doppler run -- docker compose up -d --force-recreate
