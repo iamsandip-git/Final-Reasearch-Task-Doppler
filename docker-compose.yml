@@ -72,8 +72,8 @@ services:
         condition: service_started
       db:
         condition: service_healthy
-    command: >
-      "python main.py"
+    # command: >
+    #   "python main.py"
     networks:
     - new-network
 
