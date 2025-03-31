@@ -14,7 +14,7 @@ NEWSPIDER_MODULE = "newscraper.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = "newscraper (+http://www.yourdomain.com)"
+USER_AGENT = "PostmanRuntime/7.36.0"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
