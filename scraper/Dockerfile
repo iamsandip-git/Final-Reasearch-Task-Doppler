@@ -52,8 +52,8 @@ COPY wait-for-it.sh /app/wait-for-it.sh
 RUN chmod +x /app/wait-for-it.sh
 
 # Ensure main.py is in the correct location
-COPY scraper/main.py /app/scraper/main.py
-
+# COPY scraper/main.py /app/scraper/main.py
+COPY main.py /app/scraper/main.py
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
