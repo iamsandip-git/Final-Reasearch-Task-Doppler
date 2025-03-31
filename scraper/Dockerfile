@@ -27,6 +27,4 @@ ENV PYTHONUNBUFFERED=1
 COPY main.py .
 # Default command (can be overridden in docker-compose.yml)
 # CMD ["python", "main.py"]
-CMD ["python manage.py makemigrations && \
-    python manage.py migrate && \
-    python ./scraper/main.py"]
+CMD python ./scraper/main.py
