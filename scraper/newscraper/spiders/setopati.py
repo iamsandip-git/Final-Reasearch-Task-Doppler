@@ -41,7 +41,14 @@ class SetopatiSpider(scrapy.Spider):
 
     def parse_news(self, response):
         title = response.css("h1.news-big-title::text").get()
-        image_url = response.css("div#featured-images img::attr(src)").get()
+        image_url = None
+        section = response.xpath("/html/body/div[6]/div/section")
+        for img in section.css("img"):
+          data_src = img.xpath("@data-src").get()
+          if data_src and "/uploads/posts/" in data_src:
+            image_url = data_src
+            break
+          continue        
         link = response.meta["link"]
         source = response.meta["source"]
         scraped_data = {
