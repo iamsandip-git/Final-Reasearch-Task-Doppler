@@ -28,6 +28,7 @@
 # # Default command (can be overridden in docker-compose.yml)
 # # CMD ["python", "main.py"]
 # CMD python ./scraper/main.py# Use an official Python runtime as the base image
+# Use an official Python runtime as the base image
 FROM python:3.9-slim
 
 # Set the working directory in the container
@@ -52,8 +53,8 @@ COPY wait-for-it.sh /app/wait-for-it.sh
 RUN chmod +x /app/wait-for-it.sh
 
 # Ensure main.py is in the correct location
-# COPY scraper/main.py /app/scraper/main.py
-COPY main.py /app/scraper/main.py
+# Note: Since "main.py" is already in the "scraper" directory, no additional COPY is needed for "main.py".
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
