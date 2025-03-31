@@ -60,7 +60,7 @@ services:
       dockerfile: Dockerfile
     container_name: news_scraper
     command: >
-      sh -c "python main.py"
+      sh -c "python /app/scraper/main.py"
     volumes:
       - .:/app
     environment:
