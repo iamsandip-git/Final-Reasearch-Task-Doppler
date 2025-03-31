@@ -58,8 +58,11 @@ services:
       context: ./scraper
       dockerfile: Dockerfile
     container_name: news_scraper
+    command: >
+      sh -c "./wait-for-it.sh db:5432 --timeout=125 --strict -- 
+              python main.py"
     volumes:
-    - .:/app
+      - .:/app
     environment:
       DATABASE_ENGINE: ${DATABASE_ENGINE}
       DATABASE_HOST: ${DATABASE_HOST}
@@ -68,12 +71,12 @@ services:
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
-      backend:
-        condition: service_started
       db:
         condition: service_healthy
+      backend:
+        condition: service_started
     networks:
-    - new-network
+      - new-network
 
   frontend:
     build:
