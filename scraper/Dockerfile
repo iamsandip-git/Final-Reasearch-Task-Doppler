@@ -24,6 +24,6 @@ COPY . .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-COPY main.py .
+# COPY main.py .
 # Default command (can be overridden in docker-compose.yml)
-CMD ["python", "./main.py"]
+CMD ["python", "main.py"]
