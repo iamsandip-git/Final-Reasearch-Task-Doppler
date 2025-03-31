@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "newscraper.spiders"
 USER_AGENT = "PostmanRuntime/7.36.0"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 1
