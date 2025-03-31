@@ -50,7 +50,7 @@ COPY . .
 
 # Add the wait-for-it.sh script and make it executable
 COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
+RUN chmod 777 /app/wait-for-it.sh
 
 # Ensure main.py is in the correct location
 # Note: Since "main.py" is already in the "scraper" directory, no additional COPY is needed for "main.py".
