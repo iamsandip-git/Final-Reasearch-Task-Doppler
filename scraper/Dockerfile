@@ -49,8 +49,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Add the wait-for-it.sh script and make it executable
-COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod 777 /app/wait-for-it.sh
+COPY wait-for-it.sh wait-for-it.sh
+RUN chmod 777 wait-for-it.sh
 
 # Ensure main.py is in the correct location
 # Note: Since "main.py" is already in the "scraper" directory, no additional COPY is needed for "main.py".
@@ -59,4 +59,4 @@ RUN chmod 777 /app/wait-for-it.sh
 ENV PYTHONUNBUFFERED=1
 
 # Default command (can be overridden in docker-compose.yml)
-CMD ["sh", "-c", "/app/wait-for-it.sh db:5432 --timeout=60 --strict -- python /app/scraper/main.py"]
+CMD ["sh", "-c", "wait-for-it.sh db:5432 --timeout=60 --strict -- python /app/scraper/main.py"]
