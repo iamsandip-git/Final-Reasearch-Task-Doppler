@@ -47,7 +47,7 @@ services:
     networks:
       - new-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://35.178.65.136:8000/api/health"]
+      test: ["CMD", "curl", "-f", "http://35.178.116.53:8000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5
