@@ -15,7 +15,7 @@ COPY . .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-# COPY main.py .
+COPY main.py .
 # Run migrations and start the scraper script
 CMD python manage.py makemigrations && \
     python manage.py migrate && \
