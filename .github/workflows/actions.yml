@@ -4,9 +4,9 @@ on:
   push:
     branches: [final-task-doppler]
 
-env:
-  EC2_USER: ubuntu
-  APP_DIR: /home/ubuntu/app
+# env:
+#   EC2_USER: ubuntu
+#   APP_DIR: /home/ubuntu/app
   # ALLOWED_HOSTS: "${ALLOWED_HOSTS}"
 
 jobs:
